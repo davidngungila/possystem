@@ -326,18 +326,42 @@ Route::get('/{id}/pdf', [InvoiceController::class,'pdf'])->name('pdf');
         $r->validate(['avatar'=>'required|image|max:2048']);
         $user = auth()->user();
         $file = $r->file('avatar');
-        $dir = public_path('avatars');
-        if(!is_dir($dir)) mkdir($dir,0755,true);
         $name = 'avatar_'.$user->id.'_'.time().'.'.$file->getClientOriginalExtension();
-        $file->move($dir, $name);
-        $path = 'avatars/'.$name;
-        // delete old avatar if exists and not default
-        if(!empty($user->avatar) && file_exists(public_path($user->avatar)) && $user->avatar !== $path){
-            @unlink(public_path($user->avatar));
+        try {
+            $dir = public_path('avatars');
+            if (!is_dir($dir)) {
+                @mkdir($dir, 0775, true);
+            }
+            if (is_dir($dir) && !is_writable($dir)) {
+                @chmod($dir, 0775);
+            }
+            if (is_dir($dir) && is_writable($dir)) {
+                $file->move($dir, $name);
+                $path = 'avatars/'.$name;
+            } else {
+                // Fallback to storage/app/public/avatars (requires php artisan storage:link)
+                $stored = $file->storeAs('avatars', $name, 'public');
+                $path = 'storage/'.$stored;
+                if (!is_link(public_path('storage')) && !is_dir(public_path('storage'))) {
+                    @symlink(storage_path('app/public'), public_path('storage'));
+                }
+            }
+            // delete old avatar if exists and not default
+            if(!empty($user->avatar) && file_exists(public_path($user->avatar)) && $user->avatar !== $path){
+                @unlink(public_path($user->avatar));
+            }
+            // also clean storage variant if old was in storage
+            if(!empty($user->avatar) && str_starts_with($user->avatar, 'storage/avatars/')){
+                $oldStorage = storage_path('app/public/'.substr($user->avatar, 8));
+                if(file_exists($oldStorage) && $user->avatar !== $path) @unlink($oldStorage);
+            }
+            $user->update(['avatar'=>$path]);
+            \App\Models\AuditLog::create(['user_id'=>auth()->id(),'action'=>'update_avatar','model_type'=>\App\Models\User::class,'model_id'=>$user->id,'ip_address'=>$r->ip()]);
+            return back()->with('success','Profile image updated');
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Avatar upload failed: '.$e->getMessage());
+            return back()->withErrors(['avatar' => 'Upload failed: '.$e->getMessage().' — Ensure public/avatars is writable (chmod 775) or run: mkdir -p public/avatars && chmod 775 public/avatars && chown www-data:www-data public/avatars'])->withInput();
         }
-        $user->update(['avatar'=>$path]);
-        \App\Models\AuditLog::create(['user_id'=>auth()->id(),'action'=>'update_avatar','model_type'=>\App\Models\User::class,'model_id'=>$user->id,'ip_address'=>$r->ip()]);
-        return back()->with('success','Profile image updated');
     })->name('profile.avatar');
     Route::get('/account-setting', function(){ return view('profile.account'); })->name('account.setting');
     Route::put('/account-setting', function(Request $r){
