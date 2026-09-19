@@ -1,4 +1,4 @@
-@extends(auth()->check() && auth()->user()->isAdmin() ? 'layouts.admin' : (auth()->check() ? 'layouts.applicant' : 'layouts.app'))
+@extends(auth()->check() && auth()->user()->isAdmin() ? 'layouts.admin' : (auth()->check() ? 'layouts.pos' : 'layouts.app'))
 @section('title','403 — Forbidden')
 @section('content')
 <div style="max-width:780px;margin:0 auto;padding:48px 24px 60px;text-align:center;">

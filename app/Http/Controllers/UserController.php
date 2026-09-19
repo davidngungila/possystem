@@ -10,18 +10,21 @@ class UserController extends Controller
 {
     public function index()
     {
+        if(!auth()->check() || !auth()->user()->isAdmin()) abort(403, 'Admin only — Users management restricted.');
         $users = User::with('shop')->latest()->paginate(15);
         return view('users.index', compact('users'));
     }
 
     public function create()
     {
+        if(!auth()->check() || !auth()->user()->isAdmin()) abort(403, 'Admin only.');
         $shops = \App\Models\Shop::where('is_active',1)->orderBy('name')->get();
         return view('users.create', compact('shops'));
     }
 
     public function store(Request $request)
     {
+        if(!auth()->check() || !auth()->user()->isAdmin()) abort(403, 'Admin only.');
         $data = $request->validate([
             'name' => 'required|string|max:191',
             'email' => 'required|email|unique:users,email',
@@ -51,6 +54,7 @@ class UserController extends Controller
 
     public function edit($encId)
     {
+        if(!auth()->check() || !auth()->user()->isAdmin()) abort(403, 'Admin only.');
         $user = User::findOrFail(decIdOrRaw($encId));
         $shops = \App\Models\Shop::where('is_active',1)->orderBy('name')->get();
         return view('users.edit', compact('user','shops'));
@@ -58,6 +62,7 @@ class UserController extends Controller
 
     public function update(Request $request, $encId)
     {
+        if(!auth()->check() || !auth()->user()->isAdmin()) abort(403, 'Admin only.');
         $user = User::findOrFail(decIdOrRaw($encId));
         $old = $user->only(['name','email','role','is_active','shop_id']);
         $data = $request->validate([
@@ -92,7 +97,7 @@ class UserController extends Controller
 
     public function destroy(Request $request, $encId)
     {
-        if(auth()->check() && auth()->user()->isCashier()) abort(403, 'Cashiers cannot delete records.');
+        if(!auth()->check() || !auth()->user()->isAdmin()) abort(403, 'Admin only — Users management restricted.');
         $user = User::findOrFail(decIdOrRaw($encId));
         if ($user->id === auth()->id()) {
             return back()->with('error','You cannot delete your own account.');
