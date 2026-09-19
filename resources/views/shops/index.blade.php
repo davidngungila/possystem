@@ -33,16 +33,16 @@
                         </div>
                     </td>
                     <td><span class="cell-mono">{{ $shop->code }}</span></td>
-                    <td>
-                        <div style="display:flex;flex-wrap:wrap;gap:4px">
+                    <td style="max-width:220px">
+                        <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block" title="{{ $shop->shopTypeLabel() }}">
                             @forelse($shop->shopTypesArray() as $typeKey)
                                 @php $t = \App\Models\Shop::types()[$typeKey] ?? ['label' => ucwords(str_replace('_',' ',$typeKey))]; @endphp
-                                <span class="tag tag-grey" style="font-size:11px">{{ $t['label'] }}</span>
+                                <span class="tag tag-grey" style="font-size:11px;display:inline-block;vertical-align:middle;max-width:100%">{{ $t['label'] }}</span>
                             @empty
                                 <span class="tag tag-grey" style="font-size:11px">General Shop / Duka</span>
                             @endforelse
                         </div>
-                        <div class="cell-sub" style="font-size:11px;margin-top:4px">{{ $shop->shopTypeExamples() }}</div>
+                        <div class="cell-sub" style="font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px" title="{{ $shop->shopTypeExamples() }}">{{ $shop->shopTypeExamples() }}</div>
                     </td>
                     <td><div class="cell-title" style="font-size:13px">{{ $shop->phone ?? '—' }}</div><div class="cell-sub">{{ $shop->email ?? '' }}</div></td>
                     <td class="center"><span class="tag tag-grey">{{ $shop->products_count ?? $shop->products()->count() }}</span></td>
