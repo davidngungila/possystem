@@ -198,8 +198,8 @@ class ProductCatalogueSeeder extends Seeder
             $created++;
         }
 
-        // Generate additional synthetic products to reach 1000+ if needed
-        $targetTotal = 1050;
+        // Generate additional synthetic products to reach 2000+ if needed
+        $targetTotal = 2000;
         $currentTotal = Product::count();
         if ($currentTotal < $targetTotal) {
             $needed = $targetTotal - $currentTotal;
