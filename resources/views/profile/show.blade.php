@@ -49,8 +49,10 @@
             <div style="font-weight:800;color:var(--coffee-900)">Quick Links</div>
             <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
                 <a href="{{ route('account.setting') }}" class="btn btn-ghost btn-sm">Account Setting</a>
+                @if(auth()->check() && auth()->user()->isAdmin())
                 <a href="{{ route('shops.index') }}" class="btn btn-ghost btn-sm">Shops</a>
                 <a href="{{ route('audit-logs.index') }}" class="btn btn-ghost btn-sm">Audit Logs</a>
+                @endif
                 <form method="POST" action="{{ route('logout') }}" style="display:inline">@csrf<button class="btn btn-ghost btn-sm" style="color:var(--danger)">Logout</button></form>
             </div>
         </div>
