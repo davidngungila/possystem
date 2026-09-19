@@ -198,6 +198,64 @@ class ProductCatalogueSeeder extends Seeder
             $created++;
         }
 
+        // Generate additional synthetic products to reach 1000+ if needed
+        $targetTotal = 1050;
+        $currentTotal = Product::count();
+        if ($currentTotal < $targetTotal) {
+            $needed = $targetTotal - $currentTotal;
+            $shopTypes = array_keys(Shop::types());
+            $extraAdjectives = ['Premium','Standard','Deluxe','Classic','Super','Eco','Pro','Lite','Max','Prime'];
+            $extraSuffixes = ['Plus','Extra','Gold','Silver','Fresh','Natural','Organic','Family','Jumbo','Mini'];
+            $perType = (int) ceil($needed / max(1, count($shopTypes)));
+            $extraCreated = 0;
+            foreach ($shopTypes as $typeKey) {
+                $typeInfo = Shop::types()[$typeKey];
+                $examples = explode(',', $typeInfo['examples'] ?? 'General');
+                $baseCategory = Category::whereJsonContains('shop_types', $typeKey)->first() ?? Category::first();
+                $baseUnit = Unit::first();
+                for ($i = 1; $i <= $perType && ($currentTotal + $extraCreated) < $targetTotal; $i++) {
+                    $adj = $extraAdjectives[array_rand($extraAdjectives)];
+                    $suf = $extraSuffixes[array_rand($extraSuffixes)];
+                    $catName = $baseCategory ? $baseCategory->name : 'General Merchandise';
+                    $productName = $typeInfo['label'].' '.$adj.' '.$catName.' '.$suf.' '.$i;
+                    // Ensure unique name
+                    if (Product::where('name', $productName)->exists()) continue;
+                    $sku = strtoupper(Str::slug(substr($productName,0,10), '-')).'-'.strtoupper(Str::random(3)).rand(100,999);
+                    $shopForExtra = Shop::whereJsonContains('shop_type', $typeKey)->first();
+                    $shopIdExtra = $shopForExtra?->id ?? $defaultShopId;
+                    if (!$shopForExtra) $shopIdExtra = null;
+                    // Pick a category for this shop type
+                    $catForType = Category::whereJsonContains('shop_types', $typeKey)->inRandomOrder()->first() ?? $baseCategory;
+                    $unitForExtra = Unit::inRandomOrder()->first() ?? $baseUnit;
+                    Product::create([
+                        'shop_id' => $shopIdExtra,
+                        'name' => $productName,
+                        'sku' => $sku,
+                        'barcode' => null,
+                        'category_id' => $catForType?->id,
+                        'brand_id' => null,
+                        'unit_id' => $unitForExtra?->id,
+                        'supplier_id' => null,
+                        'buying_price' => rand(500, 5000),
+                        'selling_price' => rand(1000, 8000),
+                        'wholesale_price' => null,
+                        'current_stock' => 0,
+                        'min_stock' => 5,
+                        'tax_rate' => 18,
+                        'product_type' => 'Physical',
+                        'track_stock' => true,
+                        'track_batch' => false,
+                        'track_expiry' => false,
+                        'status' => 'active',
+                        'description' => $productName.' — Auto-generated sample for '.$typeInfo['label'],
+                    ]);
+                    $extraCreated++;
+                }
+            }
+            $this->command->info("Generated $extraCreated additional synthetic products to reach 1000+.");
+            $created += $extraCreated;
+        }
+
         $this->command->info("Product catalogue seeded: $created created, $skipped skipped (already exists). Total products: ".Product::count());
     }
 
