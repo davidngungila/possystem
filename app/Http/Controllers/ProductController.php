@@ -236,17 +236,18 @@ class ProductController extends Controller
         return redirect()->route('products.index')->with('success', 'Product deleted');
     }
 
-    // AJAX barcode lookup for POS
+    // AJAX barcode lookup for POS + catalogue search for product create
     public function lookup(Request $request)
     {
         $q = $request->input('q');
         if (!$q) return response()->json([]);
         $shopId = currentShopId();
-        $base = Product::when($shopId, fn($qq)=>$qq->where('shop_id',$shopId));
+        // Include global (null shop_id) sample catalogue plus current shop products
+        $base = Product::when($shopId, fn($qq)=>$qq->where(function($qq2) use ($shopId){ $qq2->where('shop_id',$shopId)->orWhereNull('shop_id'); }));
         $p = (clone $base)->where(function($qq) use($q){ $qq->where('barcode',$q)->orWhere('sku',$q); })->first();
         if ($p) return response()->json($p);
-        // fallback search
-        $list = (clone $base)->where(function($qq) use($q){ $qq->where('name','like',"%{$q}%")->orWhere('sku','like',"%{$q}%"); })->limit(8)->get(['id','name','sku','barcode','selling_price','current_stock']);
+        // fallback search by name/sku/barcode
+        $list = (clone $base)->where(function($qq) use($q){ $qq->where('name','like',"%{$q}%")->orWhere('sku','like',"%{$q}%")->orWhere('barcode','like',"%{$q}%"); })->limit(8)->get(['id','name','sku','barcode','category_id','brand_id','unit_id','supplier_id','buying_price','selling_price','wholesale_price','tax_rate','description','product_type','current_stock']);
         return response()->json($list);
     }
 }
