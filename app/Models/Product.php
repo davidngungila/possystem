@@ -9,7 +9,8 @@ class Product extends Model
     protected $fillable = [
         'shop_id','name','sku','barcode','category_id','brand_id','unit_id','supplier_id',
         'description','buying_price','selling_price','wholesale_price',
-        'current_stock','min_stock','tax_rate','expiry_date','batch_number','image','status'
+        'current_stock','min_stock','tax_rate','expiry_date','batch_number','image','status',
+        'product_type','track_stock','track_batch','track_expiry','catalogue_id'
     ];
 
     protected $casts = [

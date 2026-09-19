@@ -101,6 +101,26 @@ class UnitsCategoriesSeeder extends Seeder
             ['name' => 'Tray', 'short_name' => 'tray'],
             ['name' => 'Meter', 'short_name' => 'm'],
             ['name' => 'Dozen Pack', 'short_name' => 'dzpk'],
+            // Additional from Complete Catalogue
+            ['name' => 'Cubic Metre', 'short_name' => 'm3'],
+            ['name' => 'Sack', 'short_name' => 'sack'],
+            ['name' => 'Bunch', 'short_name' => 'bunch'],
+            ['name' => 'Bundle', 'short_name' => 'bundle'],
+            ['name' => 'Plate', 'short_name' => 'plate'],
+            ['name' => 'Cup', 'short_name' => 'cup'],
+            ['name' => 'Glass', 'short_name' => 'glass'],
+            ['name' => 'Night', 'short_name' => 'night'],
+            ['name' => 'Session', 'short_name' => 'session'],
+            ['name' => 'Service', 'short_name' => 'service'],
+            ['name' => 'Trip', 'short_name' => 'trip'],
+            ['name' => 'Ream', 'short_name' => 'ream'],
+            ['name' => 'Jar', 'short_name' => 'jar'],
+            ['name' => 'Tub', 'short_name' => 'tub'],
+            ['name' => 'Pack', 'short_name' => 'pack'],
+            ['name' => 'Tube', 'short_name' => 'tube'],
+            ['name' => 'Sheet', 'short_name' => 'sheet'],
+            ['name' => 'Bucket', 'short_name' => 'bucket'],
+            ['name' => 'Pair', 'short_name' => 'pair'], // ensure exists (duplicate safe via firstOrCreate)
         ];
 
         foreach ($units as $u) {
