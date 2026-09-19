@@ -23,15 +23,16 @@
                     @error('code')<span class="field-err">{{ $message }}</span>@enderror
                 </div>
                 <div class="field @error('shop_type') err @enderror">
-                    <label class="field-label">Shop Type *</label>
-                    <select name="shop_type" required style="width:100%;padding:10px 11px;border:1.5px solid var(--line);border-radius:10px;background:#fff">
-                        <option value="">Select shop type...</option>
+                    <label class="field-label">Shop Types * <span style="font-weight:400;color:var(--ink-soft)">— hold Ctrl/Cmd to select multiple</span></label>
+                    <select name="shop_type[]" multiple required size="8" style="width:100%;padding:8px;border:1.5px solid var(--line);border-radius:10px;background:#fff;min-height:140px">
+                        @php $oldTypes = old('shop_type', []); @endphp
                         @foreach(\App\Models\Shop::types() as $key => $t)
-                            <option value="{{ $key }}" @selected(old('shop_type')==$key)>{{ $t['label'] }} — {{ $t['examples'] }}</option>
+                            <option value="{{ $key }}" @selected(is_array($oldTypes) && in_array($key, $oldTypes))>{{ $t['label'] }} — {{ $t['examples'] }}</option>
                         @endforeach
                     </select>
                     @error('shop_type')<span class="field-err">{{ $message }}</span>@enderror
-                    <span class="field-hint">Choose the category that best fits your shop — controls suggested products</span>
+                    @error('shop_type.*')<span class="field-err">{{ $message }}</span>@enderror
+                    <span class="field-hint">Single shop can handle multiple product types — select all that apply (e.g. General Shop + Pharmacy)</span>
                 </div>
                 <div class="field @error('phone') err @enderror">
                     <label class="field-label">Phone</label>

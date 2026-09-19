@@ -33,7 +33,17 @@
                         </div>
                     </td>
                     <td><span class="cell-mono">{{ $shop->code }}</span></td>
-                    <td><div class="cell-title" style="font-size:13px">{{ $shop->shopTypeLabel() }}</div><div class="cell-sub" style="font-size:11px">{{ $shop->shopTypeExamples() }}</div></td>
+                    <td>
+                        <div style="display:flex;flex-wrap:wrap;gap:4px">
+                            @forelse($shop->shopTypesArray() as $typeKey)
+                                @php $t = \App\Models\Shop::types()[$typeKey] ?? ['label' => ucwords(str_replace('_',' ',$typeKey))]; @endphp
+                                <span class="tag tag-grey" style="font-size:11px">{{ $t['label'] }}</span>
+                            @empty
+                                <span class="tag tag-grey" style="font-size:11px">General Shop / Duka</span>
+                            @endforelse
+                        </div>
+                        <div class="cell-sub" style="font-size:11px;margin-top:4px">{{ $shop->shopTypeExamples() }}</div>
+                    </td>
                     <td><div class="cell-title" style="font-size:13px">{{ $shop->phone ?? '—' }}</div><div class="cell-sub">{{ $shop->email ?? '' }}</div></td>
                     <td class="center"><span class="tag tag-grey">{{ $shop->products_count ?? $shop->products()->count() }}</span></td>
                     <td class="center"><span class="tag tag-grey">{{ $shop->sales_count ?? $shop->sales()->count() }}</span></td>

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Shop extends Model
 {
     protected $fillable = ['name','code','shop_type','address','phone','email','is_active'];
-    protected $casts = ['is_active'=>'boolean'];
+    protected $casts = ['is_active'=>'boolean', 'shop_type'=>'array'];
 
     public static function types(): array
     {
@@ -52,10 +52,24 @@ class Shop extends Model
         ];
     }
 
+    public function shopTypesArray(): array
+    {
+        $val = $this->shop_type;
+        if (is_array($val)) return $val;
+        if (is_string($val) && $val !== '') {
+            $decoded = json_decode($val, true);
+            if (is_array($decoded)) return $decoded;
+            return [$val];
+        }
+        return [];
+    }
+
     public function shopTypeLabel(): string
     {
-        $t = $this->shop_type ? (self::types()[$this->shop_type]['label'] ?? ucwords(str_replace('_',' ',$this->shop_type))) : 'General Shop / Duka';
-        return $t;
+        $arr = $this->shopTypesArray();
+        if (empty($arr)) return 'General Shop / Duka';
+        $labels = array_map(fn($k) => self::types()[$k]['label'] ?? ucwords(str_replace('_',' ',$k)), $arr);
+        return implode(', ', $labels);
     }
 
     public function shopTypeIcon(): string
@@ -65,7 +79,10 @@ class Shop extends Model
 
     public function shopTypeExamples(): string
     {
-        return $this->shop_type ? (self::types()[$this->shop_type]['examples'] ?? '') : 'Sugar, rice, soap, drinks';
+        $arr = $this->shopTypesArray();
+        if (empty($arr)) return 'Sugar, rice, soap, drinks';
+        $ex = array_filter(array_map(fn($k) => self::types()[$k]['examples'] ?? '', $arr));
+        return implode(' | ', $ex);
     }
     public function users(){ return $this->hasMany(User::class); }
     public function products(){ return $this->hasMany(Product::class); }

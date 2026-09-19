@@ -29,11 +29,12 @@ class ShopController extends Controller
     public function store(Request $request)
     {
         if(auth()->user()->isCashier()) abort(403);
-        $types = implode(',', array_keys(\App\Models\Shop::types()));
+        $types = array_keys(\App\Models\Shop::types());
         $data = $request->validate([
             'name'=>'required|string|max:191',
             'code'=>'nullable|string|max:20|unique:shops,code',
-            'shop_type'=>'nullable|string|in:'.$types,
+            'shop_type'=>'nullable|array',
+            'shop_type.*'=>'string|in:'.implode(',', $types),
             'address'=>'nullable|string|max:255',
             'phone'=>'nullable|string|max:30',
             'email'=>'nullable|email|max:191',
@@ -57,11 +58,12 @@ class ShopController extends Controller
     public function update(Request $request, $encId)
     {
         $shop = Shop::findOrFail(decIdOrRaw($encId));
-        $types = implode(',', array_keys(\App\Models\Shop::types()));
+        $types = array_keys(\App\Models\Shop::types());
         $data = $request->validate([
             'name'=>'required|string|max:191',
             'code'=>'nullable|string|max:20|unique:shops,code,'.$shop->id,
-            'shop_type'=>'nullable|string|in:'.$types,
+            'shop_type'=>'nullable|array',
+            'shop_type.*'=>'string|in:'.implode(',', $types),
             'address'=>'nullable|string|max:255',
             'phone'=>'nullable|string|max:30',
             'email'=>'nullable|email|max:191',
