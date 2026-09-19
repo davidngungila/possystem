@@ -34,6 +34,11 @@
                         @foreach($categories as $c)<option value="{{ $c->id }}" @selected(old('category_id')==$c->id)>{{ $c->name }}</option>@endforeach
                     </select>
                     @error('category_id')<span class="field-err">{{ $message }}</span>@enderror
+                    @if(isset($currentShop) && $currentShop && !empty($currentShop->shopTypesArray()))
+                        <span class="field-hint">Filtered for {{ $currentShop->shopTypeLabel() }} — {{ $categories->count() }} of {{ \App\Models\Category::count() }} categories (assigned to this shop type)</span>
+                    @else
+                        <span class="field-hint">All categories — assign categories to shop types via Categories → Edit</span>
+                    @endif
                 </div>
                 <div class="field @error('brand_id') err @enderror">
                     <label class="field-label">Brand</label>

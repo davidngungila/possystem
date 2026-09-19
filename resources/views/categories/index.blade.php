@@ -12,7 +12,7 @@
     </form>
     <div class="table-scroll">
         <table>
-            <thead><tr><th>Category</th><th class="center">Products</th><th class="center">Active</th><th class="right">Actions</th></tr></thead>
+            <thead><tr><th>Category</th><th>Shop Types</th><th class="center">Products</th><th class="center">Active</th><th class="right">Actions</th></tr></thead>
             <tbody>
             @forelse($categories as $c)
                 <tr>
@@ -21,6 +21,18 @@
                             <div class="thumb thumb-terracotta">{{ strtoupper(substr($c->name,0,1)) }}</div>
                             <div><div class="cell-title">{{ $c->name }}</div><div class="cell-sub mono">{{ $c->slug }}</div></div>
                         </div>
+                    </td>
+                    <td>
+                        @if(empty($c->shopTypesArray()))
+                            <span class="tag tag-grey" style="font-size:11px">All Shops</span>
+                        @else
+                            <div style="display:flex;flex-wrap:wrap;gap:4px;max-width:220px">
+                                @foreach($c->shopTypesArray() as $st)
+                                    @php $t = \App\Models\Shop::types()[$st] ?? ['label'=>ucwords(str_replace('_',' ',$st))]; @endphp
+                                    <span class="tag tag-grey" style="font-size:11px">{{ $t['label'] }}</span>
+                                @endforeach
+                            </div>
+                        @endif
                     </td>
                     <td class="center"><span class="tag tag-grey">{{ $c->products_count }}</span></td>
                     <td class="center">@if($c->is_active) <span class="tag tag-green">Active</span> @else <span class="tag tag-red">Inactive</span> @endif</td>
@@ -37,7 +49,7 @@
                     </td>
                 </tr>
             @empty
-                <tr><td colspan="4"><div class="empty-state"><strong>No categories</strong><p>Add categories to organize products.</p></div></td></tr>
+                <tr><td colspan="5"><div class="empty-state"><strong>No categories</strong><p>Add categories to organize products.</p></div></td></tr>
             @endforelse
             </tbody>
         </table>

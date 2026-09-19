@@ -26,12 +26,18 @@
                     <input name="barcode" value="{{ old('barcode',$product->barcode) }}" placeholder="leave empty if none">
                     @error('barcode')<span class="field-err">{{ $message }}</span>@enderror
                 </div>
-                <div class="field">
+                <div class="field @error('category_id') err @enderror">
                     <label class="field-label">Category</label>
                     <select name="category_id">
                         <option value="">— None —</option>
                         @foreach($categories as $c)<option value="{{ $c->id }}" @selected(old('category_id',$product->category_id)==$c->id)>{{ $c->name }}</option>@endforeach
                     </select>
+                    @error('category_id')<span class="field-err">{{ $message }}</span>@enderror
+                    @if(isset($currentShop) && $currentShop && !empty($currentShop->shopTypesArray()))
+                        <span class="field-hint">Filtered for {{ $currentShop->shopTypeLabel() }} — {{ $categories->count() }} of {{ \App\Models\Category::count() }} categories</span>
+                    @else
+                        <span class="field-hint">All categories — assign categories to shop types via Categories → Edit</span>
+                    @endif
                 </div>
                 <div class="field">
                     <label class="field-label">Brand</label>

@@ -20,9 +20,16 @@ class CategoryController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->validate(['name'=>'required|string|max:191','description'=>'nullable|string|max:500']);
+        $types = array_keys(\App\Models\Shop::types());
+        $data = $request->validate([
+            'name'=>'required|string|max:191',
+            'description'=>'nullable|string|max:500',
+            'shop_types'=>'nullable|array',
+            'shop_types.*'=>'string|in:'.implode(',', $types),
+        ]);
         $data['slug'] = Str::slug($data['name']).'-'.Str::random(4);
         $data['is_active'] = $request->boolean('is_active', true);
+        if (empty($data['shop_types'])) $data['shop_types'] = null;
         $cat = Category::create($data);
         \App\Models\AuditLog::create(['user_id'=>auth()->id(),'action'=>'create_category','model_type'=>Category::class,'model_id'=>$cat->id,'new_values'=>$cat->toArray(),'ip_address'=>$request->ip()]);
         return redirect()->route('categories.index')->with('success','Category created: '.$cat->name);
@@ -37,8 +44,15 @@ class CategoryController extends Controller
     public function update(Request $request, $encId)
     {
         $category = Category::findOrFail(decIdOrRaw($encId));
-        $data = $request->validate(['name'=>'required|string|max:191','description'=>'nullable|string|max:500']);
+        $types = array_keys(\App\Models\Shop::types());
+        $data = $request->validate([
+            'name'=>'required|string|max:191',
+            'description'=>'nullable|string|max:500',
+            'shop_types'=>'nullable|array',
+            'shop_types.*'=>'string|in:'.implode(',', $types),
+        ]);
         $data['is_active'] = $request->boolean('is_active');
+        if (empty($data['shop_types'])) $data['shop_types'] = null;
         $category->update($data);
         \App\Models\AuditLog::create(['user_id'=>auth()->id(),'action'=>'update_category','model_type'=>Category::class,'model_id'=>$category->id,'ip_address'=>$request->ip()]);
         return redirect()->route('categories.index')->with('success','Category updated');

@@ -41,11 +41,21 @@ class ProductController extends Controller
     public function create()
     {
         $shopId = currentShopId();
+        $shop = currentShop();
+        $catQuery = Category::where('is_active',1);
+        if ($shop && !empty($shop->shopTypesArray())) {
+            $types = $shop->shopTypesArray();
+            $catQuery->where(function($q) use ($types){
+                foreach($types as $t){ $q->orWhereJsonContains('shop_types', $t); }
+                $q->orWhereNull('shop_types');
+            });
+        }
         return view('products.create', [
-            'categories' => Category::where('is_active',1)->orderBy('name')->get(),
+            'categories' => $catQuery->orderBy('name')->get(),
             'brands' => Brand::where('is_active',1)->orderBy('name')->get(),
             'units' => Unit::where('is_active',1)->orderBy('name')->get(),
             'suppliers' => Supplier::when($shopId, fn($q)=>$q->where('shop_id',$shopId))->where('is_active',1)->orderBy('name')->get(),
+            'currentShop' => $shop,
         ]);
     }
 
@@ -114,12 +124,22 @@ class ProductController extends Controller
         $product = Product::findOrFail(decIdOrRaw($encId));
         if($product->shop_id && currentShopId() && $product->shop_id !== currentShopId()) abort(404);
         $shopId = currentShopId();
+        $shop = currentShop();
+        $catQuery = Category::where('is_active',1);
+        if ($shop && !empty($shop->shopTypesArray())) {
+            $types = $shop->shopTypesArray();
+            $catQuery->where(function($q) use ($types){
+                foreach($types as $t){ $q->orWhereJsonContains('shop_types', $t); }
+                $q->orWhereNull('shop_types');
+            });
+        }
         return view('products.edit', [
             'product' => $product,
-            'categories' => Category::where('is_active',1)->orderBy('name')->get(),
+            'categories' => $catQuery->orderBy('name')->get(),
             'brands' => Brand::where('is_active',1)->orderBy('name')->get(),
             'units' => Unit::where('is_active',1)->orderBy('name')->get(),
             'suppliers' => Supplier::when($shopId, fn($q)=>$q->where('shop_id',$shopId))->where('is_active',1)->orderBy('name')->get(),
+            'currentShop' => $shop,
         ]);
     }
 
