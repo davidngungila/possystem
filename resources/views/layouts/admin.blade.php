@@ -165,7 +165,7 @@
                 </div>
             </div>
 
-            <div class="sb-drop {{ request()->routeIs('customers*') || request()->routeIs('shops*') ? 'open' : '' }}">
+            <div class="sb-drop {{ request()->routeIs('customers*') ? 'open' : '' }}">
                 <button type="button" class="sb-item sb-drop-toggle" onclick="toggleSbDrop(this)">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M14 11a4 4 0 0 1 2 3v1"/></svg>
                     <span>Customers</span>
@@ -173,11 +173,15 @@
                 </button>
                 <div class="sb-drop-menu">
                     <a href="{{ \Illuminate\Support\Facades\Route::has('customers.index') ? route('customers.index') : url('/customers') }}" class="sb-drop-sub {{ request()->routeIs('customers*') ? 'active' : '' }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M14 11a4 4 0 0 1 2 3v1"/></svg> Customers</a>
-                    @if(auth()->check() && auth()->user()->isAdmin())
-                    <a href="{{ \Illuminate\Support\Facades\Route::has('shops.index') ? route('shops.index') : url('/shops') }}" class="sb-drop-sub {{ request()->routeIs('shops*') ? 'active' : '' }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Shops</a>
-                    @endif
                 </div>
             </div>
+
+            @if(auth()->check() && auth()->user()->isAdmin())
+            <a href="{{ \Illuminate\Support\Facades\Route::has('shops.index') ? route('shops.index') : url('/shops') }}" class="sb-item {{ request()->routeIs('shops*') ? 'active' : '' }}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <span>Shops</span>
+            </a>
+            @endif
 
             @if(auth()->check() && auth()->user()->isAdmin())
             <div class="sb-drop {{ request()->routeIs('payments*') || request()->routeIs('expenses*') || request()->routeIs('shifts*') ? 'open' : '' }}">
