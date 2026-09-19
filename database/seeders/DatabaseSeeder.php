@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             UnitsCategoriesSeeder::class,
             ProductCatalogueSeeder::class,
             PharmacyCatalogueSeeder::class,
+            ShopTypeFullCatalogueSeeder::class,
         ]);
     }
 }
