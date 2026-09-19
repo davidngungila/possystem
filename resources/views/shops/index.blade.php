@@ -22,7 +22,7 @@
     </form>
     <div class="table-scroll">
         <table>
-            <thead><tr><th>Shop</th><th>Code</th><th>Contact</th><th class="center">Products</th><th class="center">Sales</th><th class="center">Active</th><th class="right">Actions</th></tr></thead>
+            <thead><tr><th>Shop</th><th>Code</th><th>Shop Type</th><th>Contact</th><th class="center">Products</th><th class="center">Sales</th><th class="center">Active</th><th class="right">Actions</th></tr></thead>
             <tbody>
             @forelse($shops as $shop)
                 <tr @if(currentShopId()==$shop->id) style="background:var(--sand-50)" @endif>
@@ -33,6 +33,7 @@
                         </div>
                     </td>
                     <td><span class="cell-mono">{{ $shop->code }}</span></td>
+                    <td><div class="cell-title" style="font-size:13px">{{ $shop->shopTypeLabel() }}</div><div class="cell-sub" style="font-size:11px">{{ $shop->shopTypeExamples() }}</div></td>
                     <td><div class="cell-title" style="font-size:13px">{{ $shop->phone ?? '—' }}</div><div class="cell-sub">{{ $shop->email ?? '' }}</div></td>
                     <td class="center"><span class="tag tag-grey">{{ $shop->products_count ?? $shop->products()->count() }}</span></td>
                     <td class="center"><span class="tag tag-grey">{{ $shop->sales_count ?? $shop->sales()->count() }}</span></td>
@@ -63,7 +64,7 @@
                     </td>
                 </tr>
             @empty
-                <tr><td colspan="7"><div class="empty-state"><strong>No shops</strong><p>Create your first shop.</p></div></td></tr>
+                <tr><td colspan="8"><div class="empty-state"><strong>No shops</strong><p>Create your first shop.</p></div></td></tr>
             @endforelse
             </tbody>
         </table>

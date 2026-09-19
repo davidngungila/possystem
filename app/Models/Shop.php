@@ -6,8 +6,67 @@ use Illuminate\Database\Eloquent\Model;
 
 class Shop extends Model
 {
-    protected $fillable = ['name','code','address','phone','email','is_active'];
+    protected $fillable = ['name','code','shop_type','address','phone','email','is_active'];
     protected $casts = ['is_active'=>'boolean'];
+
+    public static function types(): array
+    {
+        return [
+            'general' => ['label' => 'General Shop / Duka', 'examples' => 'Sugar, rice, soap, drinks'],
+            'mini_supermarket' => ['label' => 'Mini Supermarket', 'examples' => 'Food, beverages, household goods'],
+            'supermarket' => ['label' => 'Supermarket', 'examples' => 'Grocery, household, personal care'],
+            'pharmacy' => ['label' => 'Pharmacy', 'examples' => 'Medicines, medical supplies'],
+            'clothing' => ['label' => 'Clothing Shop', 'examples' => 'Shirts, trousers, dresses, shoes'],
+            'electronics' => ['label' => 'Electronics Shop', 'examples' => 'Phones, TVs, chargers, computers'],
+            'computer' => ['label' => 'Computer Shop', 'examples' => 'Laptops, printers, accessories'],
+            'hardware' => ['label' => 'Hardware Shop', 'examples' => 'Cement, tools, pipes, electrical items'],
+            'cosmetics' => ['label' => 'Cosmetics Shop', 'examples' => 'Perfume, lotion, makeup, hair products'],
+            'beverage' => ['label' => 'Beverage Shop', 'examples' => 'Soft drinks, water, juices'],
+            'butchery' => ['label' => 'Butchery', 'examples' => 'Beef, chicken, goat meat'],
+            'grocery' => ['label' => 'Grocery / Food Shop', 'examples' => 'Vegetables, fruits, grains'],
+            'bakery' => ['label' => 'Bakery', 'examples' => 'Bread, cakes, pastries'],
+            'restaurant' => ['label' => 'Restaurant', 'examples' => 'Meals, drinks, extras'],
+            'cafe' => ['label' => 'Cafe', 'examples' => 'Coffee, tea, snacks'],
+            'hotel' => ['label' => 'Hotel', 'examples' => 'Food, drinks, rooms/services'],
+            'agrovet' => ['label' => 'Agrovet', 'examples' => 'Seeds, animal feed, veterinary products'],
+            'agricultural' => ['label' => 'Agricultural Shop', 'examples' => 'Fertilizer, seeds, pesticides'],
+            'building_materials' => ['label' => 'Building Materials', 'examples' => 'Cement, iron sheets, timber'],
+            'auto_parts' => ['label' => 'Auto Parts', 'examples' => 'Filters, oils, spare parts'],
+            'tyre' => ['label' => 'Tyre Shop', 'examples' => 'Tyres, tubes, batteries'],
+            'fuel' => ['label' => 'Fuel Station', 'examples' => 'Petrol, diesel, lubricants'],
+            'bookshop' => ['label' => 'Bookshop', 'examples' => 'Books, stationery, printing'],
+            'stationery' => ['label' => 'Stationery', 'examples' => 'Pens, papers, files'],
+            'furniture' => ['label' => 'Furniture Shop', 'examples' => 'Chairs, tables, beds'],
+            'wholesale' => ['label' => 'Wholesale Shop', 'examples' => 'Bulk products'],
+            'flower_gift' => ['label' => 'Flower/Gift Shop', 'examples' => 'Flowers, gifts, decorations'],
+            'pet' => ['label' => 'Pet Shop', 'examples' => 'Pet food, accessories'],
+            'gaming' => ['label' => 'Gaming Shop', 'examples' => 'Games, consoles, accessories'],
+            'camera' => ['label' => 'Camera Shop', 'examples' => 'Cameras, lenses, accessories'],
+            'jewelry' => ['label' => 'Jewelry Shop', 'examples' => 'Rings, watches, necklaces'],
+            'industrial' => ['label' => 'Industrial Supply', 'examples' => 'Equipment, machinery, tools'],
+            'cleaning' => ['label' => 'Cleaning Supply', 'examples' => 'Detergents, tissue, cleaning tools'],
+            'baby' => ['label' => 'Baby Shop', 'examples' => 'Diapers, baby clothes, bottles'],
+            'fitness' => ['label' => 'Fitness Shop', 'examples' => 'Gym equipment, sportswear'],
+            'paint' => ['label' => 'Paint Shop', 'examples' => 'Paint, brushes, thinners'],
+            'laboratory' => ['label' => 'Laboratory Supply', 'examples' => 'Lab equipment and consumables'],
+        ];
+    }
+
+    public function shopTypeLabel(): string
+    {
+        $t = $this->shop_type ? (self::types()[$this->shop_type]['label'] ?? ucwords(str_replace('_',' ',$this->shop_type))) : 'General Shop / Duka';
+        return $t;
+    }
+
+    public function shopTypeIcon(): string
+    {
+        return '';
+    }
+
+    public function shopTypeExamples(): string
+    {
+        return $this->shop_type ? (self::types()[$this->shop_type]['examples'] ?? '') : 'Sugar, rice, soap, drinks';
+    }
     public function users(){ return $this->hasMany(User::class); }
     public function products(){ return $this->hasMany(Product::class); }
     public function purchases(){ return $this->hasMany(Purchase::class); }

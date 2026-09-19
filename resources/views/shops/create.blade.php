@@ -22,6 +22,17 @@
                     <input name="code" value="{{ old('code') }}" placeholder="e.g. MAIN-001">
                     @error('code')<span class="field-err">{{ $message }}</span>@enderror
                 </div>
+                <div class="field @error('shop_type') err @enderror">
+                    <label class="field-label">Shop Type *</label>
+                    <select name="shop_type" required style="width:100%;padding:10px 11px;border:1.5px solid var(--line);border-radius:10px;background:#fff">
+                        <option value="">Select shop type...</option>
+                        @foreach(\App\Models\Shop::types() as $key => $t)
+                            <option value="{{ $key }}" @selected(old('shop_type')==$key)>{{ $t['label'] }} — {{ $t['examples'] }}</option>
+                        @endforeach
+                    </select>
+                    @error('shop_type')<span class="field-err">{{ $message }}</span>@enderror
+                    <span class="field-hint">Choose the category that best fits your shop — controls suggested products</span>
+                </div>
                 <div class="field @error('phone') err @enderror">
                     <label class="field-label">Phone</label>
                     <input name="phone" value="{{ old('phone') }}" placeholder="+255 ...">
