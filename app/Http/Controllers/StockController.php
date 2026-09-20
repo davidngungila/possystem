@@ -14,8 +14,9 @@ class StockController extends Controller
         $filter = $request->input('filter', 'all');
         $shopId = currentShopId();
 
-        $base = Product::when($shopId, fn($qq)=>$qq->where('shop_id',$shopId));
+        $base = Product::where('is_sample', false)->when($shopId, fn($qq)=>$qq->where('shop_id',$shopId));
         $products = Product::with(['category','brand','unit'])
+            ->where('is_sample', false)
             ->when($shopId, fn($qq)=>$qq->where('shop_id',$shopId))
             ->when($q, fn($qq) => $qq->where(function($w) use ($q){
                 $w->where('name','like',"%{$q}%")->orWhere('sku','like',"%{$q}%")->orWhere('barcode','like',"%{$q}%");

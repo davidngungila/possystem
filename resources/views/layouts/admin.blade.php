@@ -153,6 +153,12 @@
                 </div>
             </div>
 
+            <a href="{{ \Illuminate\Support\Facades\Route::has('damp.index') ? route('damp.index') : url('/damp') }}" class="sb-item {{ request()->routeIs('damp*') || request()->routeIs('catalogue*') ? 'active' : '' }}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><rect x="8" y="21" width="8" height="3"/></svg>
+                <span>Damp Products</span>
+                <span class="badge" style="background:var(--gold-500)">{{ \App\Models\Product::where('is_sample', true)->count() }}</span>
+            </a>
+
             <div class="sb-drop {{ request()->routeIs('purchases*') || request()->routeIs('suppliers*') ? 'open' : '' }}">
                 <button type="button" class="sb-item sb-drop-toggle" onclick="toggleSbDrop(this)">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>

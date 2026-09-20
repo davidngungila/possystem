@@ -13,6 +13,7 @@ class StockExtraController extends Controller
         $q = $request->input('q');
         $shopId = currentShopId();
         $products = Product::with(['category'])
+            ->where('is_sample', false)
             ->when($shopId, fn($qq)=>$qq->where('shop_id',$shopId))
             ->when($q, fn($qq)=> $qq->where('name','like',"%{$q}%")->orWhere('sku','like',"%{$q}%"))
             ->orderBy('name')
@@ -44,6 +45,7 @@ class StockExtraController extends Controller
         $q = $request->input('q');
         $shopId = currentShopId();
         $products = Product::with(['category','brand'])
+            ->where('is_sample', false)
             ->when($shopId, fn($qq)=>$qq->where('shop_id',$shopId))
             ->when($q, fn($qq)=> $qq->where('name','like',"%{$q}%")->orWhere('sku','like',"%{$q}%")->orWhere('barcode','like',"%{$q}%"))
             ->orderBy('name')

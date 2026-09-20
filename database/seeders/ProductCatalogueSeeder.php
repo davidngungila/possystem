@@ -193,6 +193,7 @@ class ProductCatalogueSeeder extends Seeder
                 'track_batch' => false,
                 'track_expiry' => false,
                 'status' => 'active',
+                'is_sample' => true,
                 'description' => $productName.' — Sample from '. $shopTypeLabel,
             ]);
             $created++;
@@ -247,6 +248,7 @@ class ProductCatalogueSeeder extends Seeder
                         'track_batch' => false,
                         'track_expiry' => false,
                         'status' => 'active',
+                        'is_sample' => true,
                         'description' => $productName.' — Auto-generated sample for '.$typeInfo['label'],
                     ]);
                     $extraCreated++;

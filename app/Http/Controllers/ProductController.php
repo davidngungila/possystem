@@ -20,6 +20,7 @@ class ProductController extends Controller
         $shopId = currentShopId();
 
         $products = Product::with(['category','brand','unit','supplier'])
+            ->where('is_sample', false)
             ->when($shopId, fn($qq)=> $qq->where('shop_id', $shopId))
             ->when($q, function ($query) use ($q) {
                 $query->where(function ($qq) use ($q) {
@@ -38,6 +39,24 @@ class ProductController extends Controller
         return view('products.index', compact('products','q','filter'));
     }
 
+    public function catalogue(Request $request)
+    {
+        $q = $request->input('q');
+        $shopType = $request->input('shop_type');
+        $products = Product::with(['category','brand','unit'])
+            ->where('is_sample', true)
+            ->when($q, fn($qq) => $qq->where(function($w) use ($q){
+                $w->where('name','like',"%{$q}%")->orWhere('sku','like',"%{$q}%")->orWhere('barcode','like',"%{$q}%");
+            }))
+            ->when($shopType, fn($qq) => $qq->whereHas('category', fn($c) => $c->whereJsonContains('shop_types', $shopType)))
+            ->orderBy('name')
+            ->paginate(20)->withQueryString();
+        $shopTypes = \App\Models\Shop::types();
+        $sampleCount = Product::where('is_sample', true)->count();
+        $realCount = Product::where('is_sample', false)->count();
+        return view('damp.index', compact('products','q','shopType','shopTypes','sampleCount','realCount'));
+    }
+
     public function create()
     {
         $shopId = currentShopId();
@@ -50,12 +69,18 @@ class ProductController extends Controller
                 $q->orWhereNull('shop_types');
             });
         }
+        $sample = null;
+        if ($sid = request()->query('sample_id')) {
+            $sample = Product::where('is_sample', true)->find($sid);
+            if (!$sample) $sample = Product::find($sid);
+        }
         return view('products.create', [
             'categories' => $catQuery->orderBy('name')->get(),
             'brands' => Brand::where('is_active',1)->orderBy('name')->get(),
             'units' => Unit::where('is_active',1)->orderBy('name')->get(),
             'suppliers' => Supplier::when($shopId, fn($q)=>$q->where('shop_id',$shopId))->where('is_active',1)->orderBy('name')->get(),
             'currentShop' => $shop,
+            'sample' => $sample,
         ]);
     }
 
@@ -242,8 +267,11 @@ class ProductController extends Controller
         $q = $request->input('q');
         if (!$q) return response()->json([]);
         $shopId = currentShopId();
-        // Include global (null shop_id) sample catalogue plus current shop products
-        $base = Product::when($shopId, fn($qq)=>$qq->where(function($qq2) use ($shopId){ $qq2->where('shop_id',$shopId)->orWhereNull('shop_id'); }));
+        $isSampleSearch = $request->boolean('sample') || $request->boolean('catalogue') || $request->input('type')==='sample';
+        // For sample catalogue search, look only at is_sample=true; for POS, only is_sample=false
+        $base = Product::when($isSampleSearch, fn($qq)=>$qq->where('is_sample', true), fn($qq)=>$qq->where('is_sample', false))
+            ->when($shopId && !$isSampleSearch, fn($qq)=>$qq->where('shop_id',$shopId))
+            ->when($shopId && $isSampleSearch, fn($qq)=>$qq->where(function($qq2) use ($shopId){ $qq2->where('shop_id',$shopId)->orWhereNull('shop_id'); }));
         $p = (clone $base)->where(function($qq) use($q){ $qq->where('barcode',$q)->orWhere('sku',$q); })->first();
         if ($p) return response()->json($p);
         // fallback search by name/sku/barcode

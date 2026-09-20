@@ -153,7 +153,7 @@ document.addEventListener('DOMContentLoaded', function(){
         // if not full, fetch via lookup with sku/barcode
         if(!prod.category_id && prod.sku){
           try{
-            const r = await fetch('{{ route("products.lookup") }}?q='+encodeURIComponent(prod.sku), {headers:{'Accept':'application/json'}});
+            const r = await fetch('{{ route("products.lookup") }}?q='+encodeURIComponent(prod.sku)+'&sample=1', {headers:{'Accept':'application/json'}});
             const j = await r.json();
             if(j && !Array.isArray(j) && j.id) prod = j;
             else if(Array.isArray(j) && j.length) prod = j.find(x=>x.id==id) || prod;
@@ -200,13 +200,26 @@ document.addEventListener('DOMContentLoaded', function(){
     // Focus next field
     document.querySelector('[name="barcode"]')?.focus();
   }
+  // Handle ?sample_id= autofill on load (from damp catalogue Use as Template)
+  @if(isset($sample) && $sample)
+    try {
+      const sampleData = @json($sample);
+      if(sampleData && sampleData.id){
+        setTimeout(()=> {
+          autofill(sampleData);
+          input.value = sampleData.name;
+          if(window.toast) toast('Autofilled from damp: '+sampleData.name,'success');
+        }, 200);
+      }
+    } catch(e){}
+  @endif
   input.addEventListener('input', e=>{
     const q = e.target.value.trim();
     clearTimeout(t);
     if(q.length < 2){ hide(); return; }
     t = setTimeout(async ()=>{
       try{
-        const r = await fetch('{{ route("products.lookup") }}?q='+encodeURIComponent(q), {headers:{'Accept':'application/json'}});
+        const r = await fetch('{{ route("products.lookup") }}?q='+encodeURIComponent(q)+'&sample=1', {headers:{'Accept':'application/json'}});
         const data = await r.json();
         const list = Array.isArray(data) ? data : (data && data.id ? [data] : []);
         showList(list);

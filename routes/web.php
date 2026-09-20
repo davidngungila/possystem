@@ -72,7 +72,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', function () {
         $shopId = currentShopId();
         $today = \App\Models\Sale::when($shopId, fn($q)=>$q->where('shop_id',$shopId))->whereDate('created_at', today());
-        $prodBase = \App\Models\Product::when($shopId, fn($q)=>$q->where('shop_id',$shopId));
+        $prodBase = \App\Models\Product::where('is_sample', false)->when($shopId, fn($q)=>$q->where('shop_id',$shopId));
         $todayStats = [
             'transactions' => (clone $today)->count(),
             'products_sold' => \App\Models\SaleItem::whereHas('sale', fn($q)=>$q->when($shopId, fn($qq)=>$qq->where('shop_id',$shopId))->whereDate('created_at', today()))->sum('quantity'),
@@ -119,7 +119,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', function () {
             $shopId = currentShopId();
             $today = \App\Models\Sale::when($shopId, fn($q)=>$q->where('shop_id',$shopId))->whereDate('created_at', today());
-            $prodBase = \App\Models\Product::when($shopId, fn($q)=>$q->where('shop_id',$shopId));
+            $prodBase = \App\Models\Product::where('is_sample', false)->when($shopId, fn($q)=>$q->where('shop_id',$shopId));
             $todayStats = [
                 'transactions' => (clone $today)->count(),
                 'products_sold' => \App\Models\SaleItem::whereHas('sale', fn($q)=>$q->when($shopId, fn($qq)=>$qq->where('shop_id',$shopId))->whereDate('created_at', today()))->sum('quantity'),
@@ -154,7 +154,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', function () {
             $shopId = currentShopId();
             $today = \App\Models\Sale::when($shopId, fn($q)=>$q->where('shop_id',$shopId))->whereDate('created_at', today());
-            $prodBase = \App\Models\Product::when($shopId, fn($q)=>$q->where('shop_id',$shopId));
+            $prodBase = \App\Models\Product::where('is_sample', false)->when($shopId, fn($q)=>$q->where('shop_id',$shopId));
             $todayStats = [
                 'transactions' => (clone $today)->count(),
                 'products_sold' => \App\Models\SaleItem::whereHas('sale', fn($q)=>$q->when($shopId, fn($qq)=>$qq->where('shop_id',$shopId))->whereDate('created_at', today()))->sum('quantity'),
@@ -269,6 +269,8 @@ Route::get('/{id}/pdf', [InvoiceController::class,'pdf'])->name('pdf');
     Route::get('/products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
     Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
     Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
+    Route::get('/damp', [ProductController::class, 'catalogue'])->name('damp.index');
+    Route::get('/catalogue', [ProductController::class, 'catalogue'])->name('catalogue.index');
     Route::get('/stock', [StockController::class,'index'])->name('stock.index');
     Route::get('/stock-count', [StockExtraController::class,'count'])->name('stock-count.index');
     Route::get('/adjustments', [StockExtraController::class,'adjustments'])->name('adjustments.index');
@@ -431,7 +433,7 @@ Route::get('/{id}/pdf', [InvoiceController::class,'pdf'])->name('pdf');
     Route::get('/reports', function(){
         $shopId = currentShopId();
         $saleBase = \App\Models\Sale::when($shopId, fn($q)=>$q->where('shop_id',$shopId));
-        $prodBase = \App\Models\Product::when($shopId, fn($q)=>$q->where('shop_id',$shopId));
+        $prodBase = \App\Models\Product::where('is_sample', false)->when($shopId, fn($q)=>$q->where('shop_id',$shopId));
         $expBase = \App\Models\Expense::when($shopId, fn($q)=>$q->where('shop_id',$shopId));
         $totalSales = (clone $saleBase)->count();
         $totalRevenue = (clone $saleBase)->sum('total_amount');
@@ -460,7 +462,7 @@ Route::get('/{id}/pdf', [InvoiceController::class,'pdf'])->name('pdf');
     })->name('reports.sales');
     Route::get('/reports/inventory', function(){
         $shopId = currentShopId();
-        $prodBase = \App\Models\Product::when($shopId, fn($q)=>$q->where('shop_id',$shopId));
+        $prodBase = \App\Models\Product::where('is_sample', false)->when($shopId, fn($q)=>$q->where('shop_id',$shopId));
         $totalProducts = (clone $prodBase)->count();
         $stockValue = (clone $prodBase)->get()->sum(fn($p)=> $p->current_stock * $p->buying_price);
         $lowStock = (clone $prodBase)->whereColumn('current_stock','<=','min_stock')->where('current_stock','>',0)->count();

@@ -65,6 +65,7 @@ class ShopTypeFullCatalogueSeeder extends Seeder
                     'track_batch' => false,
                     'track_expiry' => in_array($categoryName, ['Health & Pharmacy','Baby Care','Dairy','Bakery','Meat & Seafood','Fruits & Vegetables']),
                     'status' => 'active',
+                    'is_sample' => true,
                     'description' => $name.' — Full sample for '.$typeInfo['label'],
                 ]);
                 $created++;

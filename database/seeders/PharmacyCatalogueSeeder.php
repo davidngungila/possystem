@@ -69,6 +69,7 @@ class PharmacyCatalogueSeeder extends Seeder
                 'track_batch' => in_array($category, ['Health & Pharmacy']),
                 'track_expiry' => in_array($category, ['Health & Pharmacy','Baby Care']),
                 'status' => 'active',
+                'is_sample' => true,
                 'description' => $name.' — Pharmacy sample',
             ]);
             $created++;
@@ -113,6 +114,7 @@ class PharmacyCatalogueSeeder extends Seeder
                     'track_batch' => true,
                     'track_expiry' => true,
                     'status' => 'active',
+                    'is_sample' => true,
                     'description' => $name.' — Auto-generated pharmacy sample',
                 ]);
                 $created++;

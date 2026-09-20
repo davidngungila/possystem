@@ -10,7 +10,7 @@ class Product extends Model
         'shop_id','name','sku','barcode','category_id','brand_id','unit_id','supplier_id',
         'description','buying_price','selling_price','wholesale_price',
         'current_stock','min_stock','tax_rate','expiry_date','batch_number','image','status',
-        'product_type','track_stock','track_batch','track_expiry','catalogue_id'
+        'product_type','track_stock','track_batch','track_expiry','catalogue_id','is_sample'
     ];
 
     protected $casts = [
@@ -19,6 +19,7 @@ class Product extends Model
         'wholesale_price' => 'decimal:2',
         'tax_rate' => 'decimal:2',
         'expiry_date' => 'date',
+        'is_sample' => 'boolean',
     ];
 
     public function shop(){ return $this->belongsTo(Shop::class); }
