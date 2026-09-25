@@ -29,26 +29,31 @@ class ProductImport implements ToModel, WithHeadingRow, WithBatchInserts, WithCh
         );
 
         return new Product([
-            'name' => $row['name'] ?? null,
-            'sku' => $row['sku'] ?? null,
-            'barcode' => $row['barcode'] ?? null,
+            'name' => $this->nullIfEmpty($row['name'] ?? null),
+            'sku' => $this->nullIfEmpty($row['sku'] ?? null),
+            'barcode' => $this->nullIfEmpty($row['barcode'] ?? null),
             'category_id' => $category->id,
             'brand_id' => $brand->id,
             'unit_id' => $unit->id,
-            'description' => $row['description'] ?? null,
-            'specifications' => $row['specifications'] ?? null,
+            'description' => $this->nullIfEmpty($row['description'] ?? null),
+            'specifications' => $this->nullIfEmpty($row['specifications'] ?? null),
             'buying_price' => $row['cost price'] ?? $row['cost_price'] ?? 0,
             'selling_price' => $row['selling price'] ?? $row['selling_price'] ?? 0,
             'current_stock' => $row['quantity'] ?? $row['qty'] ?? 0,
             'min_stock' => $row['reorder level'] ?? $row['reorder_level'] ?? 0,
             'expiry_date' => $row['expiry date'] ?? $row['expiry_date'] ?? null,
-            'batch_number' => $row['batch number'] ?? $row['batch_number'] ?? null,
+            'batch_number' => $this->nullIfEmpty($row['batch number'] ?? null),
             'status' => $row['status'] ?? 'active',
             'available_online' => isset($row['available online']) ? filter_var($row['available online'], FILTER_VALIDATE_BOOLEAN) : false,
             'scanned' => isset($row['scanned']) ? filter_var($row['scanned'], FILTER_VALIDATE_BOOLEAN) : false,
             'linked' => isset($row['linked']) ? filter_var($row['linked'], FILTER_VALIDATE_BOOLEAN) : false,
             'shop_id' => currentShopId(),
         ]);
+    }
+
+    private function nullIfEmpty($value): ?string
+    {
+        return ($value !== null && $value !== '') ? (string)$value : null;
     }
 
     public function batchSize(): int { return 500; }
