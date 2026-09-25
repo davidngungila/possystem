@@ -2,6 +2,7 @@
 
 namespace App\Imports;
 
+use Illuminate\Database\Eloquent\Model;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
@@ -14,7 +15,7 @@ use Illuminate\Support\Facades\DB;
 
 class ProductImport implements ToModel, WithHeadingRow, WithBatchInserts, WithChunkReading
 {
-    public function model(array $row)
+    public function model(array $row): Model|array|null
     {
         $barcode = $this->normalizeBarcode($row['barcode'] ?? null);
 
