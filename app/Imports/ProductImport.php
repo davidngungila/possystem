@@ -13,7 +13,7 @@ use Maatwebsite\Excel\Concerns\WithChunkReading;
 
 class ProductImport implements ToModel, WithHeadingRow, WithBatchInserts, WithChunkReading
 {
-    public function model(array $row)
+    public function model(array $row): ?\Illuminate\Database\Eloquent\Model
     {
         $category = Category::firstOrCreate(
             ['name' => trim($row['category'] ?? '')],
