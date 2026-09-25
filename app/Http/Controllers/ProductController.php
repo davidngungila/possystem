@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\ProductImport;
+use App\Exports\ProductExport;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
@@ -10,6 +12,7 @@ use App\Models\Supplier;
 use App\Models\Unit;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ProductController extends Controller
 {
@@ -277,6 +280,18 @@ class ProductController extends Controller
         // fallback search by name/sku/barcode
         $list = (clone $base)->where(function($qq) use($q){ $qq->where('name','like',"%{$q}%")->orWhere('sku','like',"%{$q}%")->orWhere('barcode','like',"%{$q}%"); })->limit(8)->get(['id','name','sku','barcode','category_id','brand_id','unit_id','supplier_id','buying_price','selling_price','wholesale_price','tax_rate','description','product_type','current_stock']);
         return response()->json($list);
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate(['file' => 'required|mimes:xlsx,xls,csv|max:10240']);
+        Excel::import(new ProductImport, $request->file('file'));
+        return redirect()->route('products.index')->with('success', 'Products imported successfully');
+    }
+
+    public function export()
+    {
+        return Excel::download(new ProductExport, 'products-' . now()->format('Y-m-d') . '.xlsx');
     }
 }
 

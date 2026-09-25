@@ -263,6 +263,8 @@ Route::get('/{id}/pdf', [InvoiceController::class,'pdf'])->name('pdf');
     // Inventory — Products full CRUD (SKU/barcode unique guard, stock movements, audit)
     Route::get('/products/lookup', [ProductController::class, 'lookup'])->name('products.lookup');
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+    Route::post('/products/import', [ProductController::class, 'import'])->name('products.import');
+    Route::get('/products/export', [ProductController::class, 'export'])->name('products.export');
     Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
     Route::post('/products', [ProductController::class, 'store'])->name('products.store');
     Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');

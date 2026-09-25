@@ -4,7 +4,13 @@
 <div class="page-head">
     <div><h1>Products</h1><p class="page-sub">SKU separate from barcode · Buying / Selling / Wholesale · Stock · Barcode unique guard</p></div>
     <div style="display:flex;gap:8px;">
+        <a href="{{ route('products.export') }}" class="btn btn-success btn-sm"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Export</a>
         <a href="{{ route('products.create') }}" class="btn btn-primary btn-sm"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add Product</a>
+        <button type="button" class="btn btn-info btn-sm" onclick="document.getElementById('importFile').click()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Import</button>
+        <form id="importForm" action="{{ route('products.import') }}" method="POST" enctype="multipart/form-data" style="display:none">
+            @csrf
+            <input type="file" id="importFile" name="file" accept=".xlsx,.xls,.csv" style="display:none" onchange="document.getElementById('importForm').submit()">
+        </form>
     </div>
 </div>
 
