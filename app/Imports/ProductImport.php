@@ -11,17 +11,13 @@ use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
-use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Concerns\WithUpserts;
 
-class ProductImport implements ToModel, WithHeadingRow, WithBatchInserts, WithChunkReading
+class ProductImport implements ToModel, WithHeadingRow, WithBatchInserts, WithChunkReading, WithUpserts
 {
     public function model(array $row): Model|array|null
     {
-        $barcode = $this->normalizeBarcode($row['barcode'] ?? null);
-
-        if ($barcode !== null && Product::where('barcode', $barcode)->exists()) {
-            return null;
-        }
+        $sku = $this->nullIfEmpty($row['sku'] ?? null);
 
         $category = Category::firstOrCreate(
             ['name' => trim($row['category'] ?? '')],
@@ -36,12 +32,10 @@ class ProductImport implements ToModel, WithHeadingRow, WithBatchInserts, WithCh
             ['short_name' => trim($row['unit'] ?? '') . '-U', 'is_active' => true]
         );
 
-        $sku = $this->nullIfEmpty($row['sku'] ?? null);
-
         return new Product([
             'name' => $this->nullIfEmpty($row['name'] ?? null),
             'sku' => $sku,
-            'barcode' => $barcode,
+            'barcode' => $this->normalizeBarcode($row['barcode'] ?? null),
             'category_id' => $category->id,
             'brand_id' => $brand->id,
             'unit_id' => $unit->id,
@@ -59,6 +53,11 @@ class ProductImport implements ToModel, WithHeadingRow, WithBatchInserts, WithCh
             'linked' => isset($row['linked']) ? filter_var($row['linked'], FILTER_VALIDATE_BOOLEAN) : false,
             'shop_id' => currentShopId(),
         ]);
+    }
+
+    public function uniqueBy(): string
+    {
+        return 'sku';
     }
 
     private function normalizeBarcode($value): ?string
